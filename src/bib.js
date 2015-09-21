@@ -39,6 +39,9 @@ bib.doc_author = function (doc) {
     } else {
         result = "[Anon]";
     }
+    result=result.replace(/(^.*),(.*)$/,"$2, $1");
+    result = result.replace(/\.?$/, ". ");
+    result = result.replace(/(^.*?\w.*?)\s(.*),/,"$1, $2");
 
     return result;
 };
@@ -219,7 +222,7 @@ bib.author = function (doc) {
             result = lead_trail;
             lead_trail = "";
         }
-        result += ", " + lead.join(" ") + lead_trail;
+        result += ", " + lead.join(" ") + lead.trail;
         if (doc.authors.length > 1) {
             // "et al" is better for real bibliography, but it's
             // actually worth being able to search all the multiple authors
@@ -238,7 +241,8 @@ bib.author = function (doc) {
     } else {
         result = "[Anon]";
     }
-
+    
+    
     return result;
 };
 
@@ -246,42 +250,57 @@ bib.citation = function (doc) {
     var result = bib.doc_author(doc);
 
     // don't duplicate trailing period on middle initial etc.
-    result = result.replace(/\.?$/, ". ");
-    result += '"' + doc.title + '."';
-    result += " <em>" + doc.journaltitle + "</em> ";
+    
+    //result=result.replace(/(^.*),(.*)$/,"$2, $1");
+    //result = result.replace(/\.?$/, ". ");
+    //result = result.replace(/(^.*?\w.*?)\s(.*),/,"$1, $2");
+    
+    //result = result.replace(/^,/,"");
+    //result = result.replace(/(^.*?)\\s\[A-Z]/,"$1,");
+    //result = result.replace(/(^.*)\s/,"$1,");
+    // result += '"' + doc.title + '."';
+    result += " <em>" + doc.journaltitle + "</em>. ";
     result += doc.volume;
     if (doc.issue) {
-        result += ", no. " + doc.issue;
+        result += "" + doc.issue;
     }
 
-    result += " (" + VIS.cite_date_format(doc.date) + "): ";
-    result += doc.pagerange + ".";
+    //result += " (" + VIS.cite_date_format(doc.date) + "): ";
+    result += doc.pagerange + "";
 
     result = result.replace(/\.\./g, ".");
+    //result = result.replace(/^.*?\d.*?,/,""); //replace three date-starters
+    //result = result.replace(/^.*?,/,""); //replace empty comma leftover
+    result = result.replace(/^.*?\s,/,""); //replace superfluous commas
     result = result.replace(/_/g, ",");
     result = result.replace(/\t/g, "");
 
     return result;
 };
-
 bib.parse = function (d) {
 
     // no header, but this is the column order:
     // 0  1     2      3            4      5     6       7      
     // id,title,author,journaltitle,volume,issue,pubdate,pagerange
-    var a_str = d[2].trim(), // author
-        date = new Date(d[6].trim()); // pubdate (UTC)
+    var a_str = d[4].trim(), // author
+        date = new Date(d[6].trim());
+    
+   var  ttl=d[5].trim();
+    ttl = ttl.replace(/\;/,": ");
+    ttl = ttl.replace(/\;/,", ");
 
     return {
-        doi: d[0].trim(), // id
-        title: d[1].trim(),
+        doi: d[1].trim(), // id
+        title: "",
         authors: a_str === "" ? [] : a_str.split(VIS.bib.author_delimiter),
-        journaltitle: d[3].trim(),
-        volume: d[4].trim(),
-        issue: d[5].trim(),
+        //authors: a_str,
+        journaltitle: d[10],
+        volume: ttl,
+        issue: " ",
         date: date, // pubdate
-        pagerange: d[7].trim()
-            .replace(/^p?p\. /, "")
-            .replace(/-/g, "–")
+        pagerange: ""
+        //pagerange: d[7].trim()
+          //  .replace(/^p?p\. /, "")
+           // .replace(/-/g, "–")
     };
 };

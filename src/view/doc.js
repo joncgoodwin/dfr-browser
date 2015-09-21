@@ -18,7 +18,7 @@ view.doc = function (p) {
                 + view.doc.uri(p.meta)
                 + '">View '
                 + p.meta.doi
-                + " on JSTOR</a>");
+                + " at HathiTrust</a>");
 
     trs = div.select("table#doc_topics tbody")
         .selectAll("tr")
@@ -60,8 +60,8 @@ view.doc = function (p) {
 };
 
 view.doc.uri = function (meta) {
-    return "http://www.jstor.org"
+    return "http://catalog.hathitrust.org/"
         + VIS.uri_proxy
-        + "/stable/"
+        + "/Record/"
         + meta.doi;
 };
