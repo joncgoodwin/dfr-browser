@@ -60,7 +60,7 @@ view.doc = function (p) {
 };
 
 view.doc.uri = function (meta) {
-    return "http://catalog.hathitrust.org/"
+    return "http://catalog.hathitrust.org"
         + VIS.uri_proxy
         + "/Record/"
         + meta.doi;
